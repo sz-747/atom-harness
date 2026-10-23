@@ -1,0 +1,24 @@
+{
+  "name": "atom-harness",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "sample": "node scripts/sample-face.mjs",
+    "prebuild": "npm run sample",
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node tests/branding.test.mjs",
+    "preview": "npm run build && node scripts/preview.mjs"
+  },
+  "dependencies": {
+    "ink": "7.1.1",
+    "react": "19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "esbuild": "^0.28.2",
+    "typescript": "~5.9.3"
+  }
+}

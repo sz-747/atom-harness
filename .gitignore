@@ -1,0 +1,7 @@
+node_modules/
+branding/generated/
+
+# Local operator notes are not part of the public repository.
+AGENTS.md
+ATOM-CONFIG.md
+references/
