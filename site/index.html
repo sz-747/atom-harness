@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atom — a calm terminal for your coding agent</title>
+  <meta name="description" content="Atom is a quiet, Pi-based coding-agent harness for Windows. A small wrapper, minimal added instructions, and a guard before destructive commands, so you can see what the model itself can do.">
+  <meta property="og:title" content="Introducing Atom">
+  <meta property="og:description" content="A calm terminal for your coding agent. Small wrapper, minimal instructions, so you can see what the model itself can do.">
+  <meta property="og:image" content="https://sz-747.github.io/atom-harness/assets/atom-face.jpg">
+  <meta name="theme-color" content="#050906">
+  <link rel="icon" href="assets/atom.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="Atom home">
+      <img src="assets/atom.svg" alt="" width="30" height="30">
+      <span>Atom</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="https://github.com/sz-747/atom-harness">GitHub</a>
+      <a class="nav-cta" href="#install">Install</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <p class="eyebrow reveal" style="--d: 0">
+        <span class="eyebrow-dot"></span> Introducing
+      </p>
+      <h1 class="hero-title reveal" style="--d: 1">Atom</h1>
+      <p class="hero-lede reveal" style="--d: 2">
+        A <em>calm</em> terminal for your coding agent. A small wrapper and minimal added
+        instructions, so you can see what the model itself can do.
+      </p>
+      <div class="hero-actions reveal" style="--d: 3">
+        <button class="btn btn-primary" type="button" data-copy="prompt">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+          <span data-copy-label>Copy setup prompt for your AI agent</span>
+        </button>
+        <a class="btn btn-ghost" href="https://github.com/sz-747/atom-harness">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1.3-4-2-6-2.5M15 21v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.3 4.3 0 0 0-.1-3.2s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.2 0C5.6 2.8 4.6 3.1 4.6 3.1a4.3 4.3 0 0 0-.1 3.2A4.6 4.6 0 0 0 3.2 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+          View on GitHub
+        </a>
+      </div>
+
+      <!-- Live demo: a session in Atom, self-playing -->
+      <div class="stage reveal" style="--d: 4" id="stage">
+        <div class="stage-chrome">
+          <span></span><span></span><span></span>
+          <p class="stage-title" id="stage-title"><b id="title-mark">○</b> ⚛ | my-app</p>
+          <p class="stage-state" id="stage-state"><i></i><b>Idle</b></p>
+        </div>
+        <div class="stage-body">
+          <div class="stage-banner">
+            <img src="assets/atom-face.jpg" alt="Atom's startup banner: a green dragon over the word ATOM" width="1400" height="700">
+          </div>
+          <div class="term" id="term" aria-live="polite"></div>
+        </div>
+        <p class="stage-hint">A sample session, played on its own <span class="hint-sep">·</span> click <kbd>Yes</kbd> or <kbd>No</kbd> when the guard asks</p>
+      </div>
+    </section>
+
+    <!-- Promise strip -->
+    <section class="promise" aria-label="Highlights">
+      <div><strong>Quiet</strong><span>A small wrapper around the model, not a large system prompt. Less noise between you and what it reasons.</span></div>
+      <div><strong>Comparable</strong><span>Run the same task here and in a heavier harness, and see how much comes from the model itself.</span></div>
+      <div><strong>Guarded</strong><span>Force pushes, hard resets and recursive deletes stop and ask you first.</span></div>
+    </section>
+
+    <!-- How it works -->
+    <section class="how" id="how">
+      <h2 class="section-title">Less harness.<br><em>More model.</em></h2>
+
+      <article class="feature">
+        <span class="feature-num">01</span>
+        <div>
+          <h3>Built on Pi</h3>
+          <p>Atom runs on the <a href="https://github.com/earendil-works/pi">Pi coding agent</a> and keeps its tools and project trust checks as they are. It only adds a few extensions on top, so a model's results stay easy to read and compare.</p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="feature-num">02</span>
+        <div>
+          <h3>A calm screen</h3>
+          <p>A dragon banner fitted to your terminal, then out of the way. The tab title shows whether the agent is idle, working, done or stopped on an error, so you can look away while it works.</p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="feature-num">03</span>
+        <div>
+          <h3>A guard before damage</h3>
+          <p>Pi has no permission system, so Atom adds one where it matters. Commands that <span class="inline-demo">force push</span>, push to <span class="inline-demo">main</span>, hard reset, discard changes or delete recursively ask you first. Say no and the model explains instead of retrying. <code>/guard</code> turns it off for a session.</p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="feature-num">04</span>
+        <div>
+          <h3>Short workflows when you want them</h3>
+          <p><code>/plan</code> turns a task into a checkable plan before any edit. <code>/verify</code> checks every claim against evidence before the model says done. <code>/wrapup</code> records what should outlive the session. Optional subagents can scout, plan and review.</p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="feature-num">05</span>
+        <div>
+          <h3>Starts where you are</h3>
+          <p>A native Windows launcher opens Atom in the folder you run it from, with your arguments and exit code intact. Nothing in your PATH or execution policy has to change.</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- Install -->
+    <section class="install" id="install">
+      <h2 class="section-title">Get <em>Atom</em></h2>
+      <p class="install-lede">Windows 10 or 11, Git and Node.js 22 or later (24 to run the tests). You also need an account or API key for at least one model provider that Pi supports.</p>
+
+      <div class="install-grid">
+        <div class="card card-agent">
+          <p class="card-kicker">Recommended · one prompt</p>
+          <h3>Let your coding agent install it</h3>
+          <p>Paste this into Claude Code, Codex or any agent that can run commands on your PC. It installs Pi, sets Atom up, builds the banner, and tells you what passed.</p>
+          <div class="prompt">
+            <pre id="prompt-text">Install Atom on this Windows PC. Follow https://github.com/sz-747/atom-harness/blob/main/INSTALL.md step by step: check Git and Node.js, install the Pi coding agent, clone the repo, install dependencies and build the banner. Ask me before installing anything globally or changing PATH. Finish with the checks at the end of the guide and tell me what passed.</pre>
+            <button class="btn btn-copy" type="button" data-copy="prompt">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+              <span data-copy-label>Copy prompt</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card card-download">
+          <p class="card-kicker">Or by hand</p>
+          <h3>Four commands</h3>
+          <pre class="cmds"><span>npm install -g @earendil-works/pi-coding-agent</span>
+<span>git clone https://github.com/sz-747/atom-harness.git</span>
+<span>cd atom-harness; npm ci; npm run build</span>
+<span>.\atom.cmd</span></pre>
+          <p>Run <code>atom.cmd</code> from the project you want to work on.</p>
+          <p class="card-note">Free and open source under the MIT license. <a href="https://github.com/sz-747/atom-harness/blob/main/INSTALL.md">Full install guide</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-brand">
+      <img src="assets/atom.svg" alt="" width="26" height="26">
+      <span>Atom</span>
+    </div>
+    <p>MIT licensed. Built on the <a href="https://github.com/earendil-works/pi">Pi coding agent</a>. Made by <a href="https://itsstevezhu.com/">Steve Zhu</a>.</p>
+    <a href="https://github.com/sz-747/atom-harness">github.com/sz-747/atom-harness</a>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
