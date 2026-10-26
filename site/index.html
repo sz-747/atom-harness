@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body id="top">
   <div class="grain" aria-hidden="true"></div>
 
   <header class="nav">
@@ -25,13 +25,13 @@
     </a>
     <nav class="nav-links">
       <a href="#how">How it works</a>
-      <a href="#changelog">Changelog</a>
+      <a href="changelog.html">Changelog</a>
       <a href="https://github.com/sz-747/atom-harness">GitHub</a>
       <a class="nav-cta" href="#install">Install</a>
     </nav>
   </header>
 
-  <main id="top">
+  <main>
     <!-- Hero -->
     <section class="hero">
       <p class="eyebrow reveal" style="--d: 0">
@@ -192,59 +192,12 @@
 <span>cd atom-harness; npm ci; npm run build</span>
 <span>.\atom.cmd</span></pre>
           <p>Run <code>atom.cmd</code> from the project you want to work on.</p>
-          <p class="card-note">Free and open source under the MIT license. <a href="https://github.com/sz-747/atom-harness/blob/main/INSTALL.md">Full install guide</a></p>
+          <p class="card-note">Free and open source under the MIT license. <a href="https://github.com/sz-747/atom-harness/blob/main/INSTALL.md">Full install guide</a> · <a href="changelog.html">What's new</a></p>
         </div>
       </div>
     </section>
 
-    <!-- Changelog: newest first, a few plain points and a picture of what changed -->
-    <section class="changelog" id="changelog">
-      <h2 class="section-title">What's <em>new</em></h2>
-
-      <article class="release">
-        <header class="release-head">
-          <h3>Install with one prompt</h3>
-          <time datetime="2026-10-26">26 Oct 2026</time>
-        </header>
-        <div class="release-body">
-          <ul>
-            <li>Paste one prompt into your coding agent: it installs Pi and Atom, builds the banner and reports each check.</li>
-            <li><a href="https://github.com/sz-747/atom-harness/blob/main/INSTALL.md">INSTALL.md</a> lists every step and the checks to run, for an agent or by hand.</li>
-            <li>This launch page, with a sample session and the setup prompt to copy.</li>
-          </ul>
-          <!-- Drawn from INSTALL.md: its prompt and its three checks -->
-          <figure class="shot" aria-label="A coding agent installing Atom from INSTALL.md and reporting the checks">
-            <div class="mini">
-              <p class="you">Install Atom on this Windows PC. Follow INSTALL.md step by step.</p>
-              <p class="check"><b>passed</b> pi --version</p>
-              <p class="check"><b>passed</b> branding\generated\header.mjs exists</p>
-              <p class="check"><b>passed</b> npm test</p>
-              <p class="ps">Open a terminal in your project and run <b>atom</b>.</p>
-            </div>
-          </figure>
-        </div>
-      </article>
-
-      <article class="release">
-        <header class="release-head">
-          <h3>First public release</h3>
-          <time datetime="2026-10-23">23 Oct 2026</time>
-        </header>
-        <div class="release-body">
-          <ul>
-            <li>Atom's startup banner, and a tab title that shows whether it is idle, working or done.</li>
-            <li>A guard that asks before force pushes, pushes to main, hard resets and recursive deletes.</li>
-            <li>Subagents, and short workflow prompts: <code>/plan</code>, <code>/verify</code>, <code>/wrapup</code>.</li>
-            <li>A Windows launcher that starts Atom in the folder you run it from.</li>
-          </ul>
-          <figure class="shot">
-            <img src="assets/basilix.jpg" width="1570" height="608" loading="lazy" alt="Atom's startup banner: a green dragon over the word BASILIX">
-          </figure>
-        </div>
-      </article>
-
-      <p class="changelog-more"><a href="https://github.com/sz-747/atom-harness/commits/main">Every change on GitHub</a></p>
-    </section>
+    <p class="to-top"><a href="#top">Back to top <span aria-hidden="true">↑</span></a></p>
   </main>
 
   <footer class="footer">

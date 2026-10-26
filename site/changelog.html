@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What's new in Atom</title>
+  <meta name="description" content="Every change to Atom: what is new, in a few plain points, with a picture of it.">
+  <meta property="og:title" content="What's new in Atom">
+  <meta property="og:description" content="Every change to Atom, with a picture of it.">
+  <meta property="og:image" content="https://sz-747.github.io/atom-harness/assets/basilix.jpg">
+  <meta name="theme-color" content="#050906">
+  <link rel="icon" href="assets/atom.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body id="top">
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="index.html" aria-label="Atom home">
+      <img src="assets/atom.svg" alt="" width="30" height="30">
+      <span>Atom</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html#how">How it works</a>
+      <a href="changelog.html" aria-current="page">Changelog</a>
+      <a href="https://github.com/sz-747/atom-harness">GitHub</a>
+      <a class="nav-cta" href="index.html#install">Install</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Newest first: a few plain points per change and a picture of it -->
+    <section class="changelog">
+      <h1 class="section-title">What's <em>new</em></h1>
+
+      <article class="release">
+        <header class="release-head">
+          <h2>Install with one prompt</h2>
+          <time datetime="2026-10-26">26 Oct 2026</time>
+        </header>
+        <div class="release-body">
+          <ul>
+            <li>Paste one prompt into your coding agent: it installs Pi and Atom, builds the banner and reports each check.</li>
+            <li><a href="https://github.com/sz-747/atom-harness/blob/main/INSTALL.md">INSTALL.md</a> lists every step and the checks to run, for an agent or by hand.</li>
+            <li>A launch page, with a sample session and the setup prompt to copy.</li>
+          </ul>
+          <!-- Drawn from INSTALL.md: its prompt and its three checks -->
+          <figure class="shot" aria-label="A coding agent installing Atom from INSTALL.md and reporting the checks">
+            <div class="mini">
+              <p class="you">Install Atom on this Windows PC. Follow INSTALL.md step by step.</p>
+              <p class="check"><b>passed</b> pi --version</p>
+              <p class="check"><b>passed</b> branding\generated\header.mjs exists</p>
+              <p class="check"><b>passed</b> npm test</p>
+              <p class="ps">Open a terminal in your project and run <b>atom</b>.</p>
+            </div>
+          </figure>
+        </div>
+      </article>
+
+      <article class="release">
+        <header class="release-head">
+          <h2>First public release</h2>
+          <time datetime="2026-10-23">23 Oct 2026</time>
+        </header>
+        <div class="release-body">
+          <ul>
+            <li>Atom's startup banner, and a tab title that shows whether it is idle, working or done.</li>
+            <li>A guard that asks before force pushes, pushes to main, hard resets and recursive deletes.</li>
+            <li>Subagents, and short workflow prompts: <code>/plan</code>, <code>/verify</code>, <code>/wrapup</code>.</li>
+            <li>A Windows launcher that starts Atom in the folder you run it from.</li>
+          </ul>
+          <figure class="shot">
+            <img src="assets/basilix.jpg" width="1570" height="608" loading="lazy" alt="Atom's startup banner: a green dragon over the word BASILIX">
+          </figure>
+        </div>
+      </article>
+
+      <p class="changelog-more"><a href="https://github.com/sz-747/atom-harness/commits/main">Every change on GitHub</a></p>
+    </section>
+
+    <p class="to-top"><a href="#top">Back to top <span aria-hidden="true">↑</span></a></p>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-brand">
+      <img src="assets/atom.svg" alt="" width="26" height="26">
+      <span>Atom</span>
+    </div>
+    <p>MIT licensed. Built on the <a href="https://github.com/earendil-works/pi">Pi coding agent</a>. Made by <a href="https://itsstevezhu.com/">Steve Zhu</a>.</p>
+    <a href="https://github.com/sz-747/atom-harness">github.com/sz-747/atom-harness</a>
+  </footer>
+</body>
+</html>
