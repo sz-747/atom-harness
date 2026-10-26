@@ -2,8 +2,8 @@
 
 /* ---------------------------------------------------------------
  * Demo: a sample Atom session. The tab title shows the status mark
- * from .pi/extensions/atom-title.ts, and the guard asks before a
- * push to main, as in .pi/extensions/atom-guard.ts.
+ * from .pi/extensions/atom-title.ts; the transcript shows only the
+ * model's reasoning and answer, with a boat while it works.
  * ------------------------------------------------------------- */
 const SPINNER = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -20,14 +20,13 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function setStatus(status) {
   clearInterval(spin);
   stage.classList.toggle('working', status === 'working');
-  stage.classList.toggle('asking', status === 'asking');
-  const labels = { idle: 'Idle', working: 'Working', asking: 'Waiting for you', done: 'Done' };
+  const labels = { idle: 'Idle', working: 'Working', done: 'Done' };
   stateLabel.textContent = labels[status];
   if (status === 'working' && !reduceMotion) {
     let frame = 0;
     spin = setInterval(() => { mark.textContent = SPINNER[frame++ % SPINNER.length]; }, 120);
   } else {
-    mark.textContent = { idle: '○', working: '⠋', asking: '⠿', done: '✓' }[status];
+    mark.textContent = { idle: '○', working: '⠋', done: '✓' }[status];
   }
 }
 
@@ -49,26 +48,30 @@ async function type(cls, text, id) {
   return true;
 }
 
-// The guard: resolves with true (run it) or false (declined).
-function ask(command, id) {
-  return new Promise((resolve) => {
-    const box = document.createElement('div');
-    box.className = 'guard';
-    box.innerHTML = '<p class="guard-h">Atom guard: push to main or master</p><p class="guard-cmd"></p>' +
-      '<div class="guard-actions"><button type="button" data-a="no">No</button><button type="button" data-a="yes">Yes</button></div>';
-    box.querySelector('.guard-cmd').textContent = command + '  Run it?';
-    term.appendChild(box);
-    const buttons = [...box.querySelectorAll('button')];
-    const choose = (answer) => {
-      if (id !== run) return;
-      buttons.forEach((b) => { b.disabled = true; b.classList.toggle('picked', b.dataset.a === answer); });
-      resolve(answer === 'yes');
-    };
-    buttons.forEach((b) => b.addEventListener('click', () => choose(b.dataset.a)));
-    // Nobody clicked: decline on their behalf, as a careful user would.
-    setTimeout(() => choose('no'), reduceMotion ? 0 : 3400);
-  });
+// The boat sails while the model works; its tool calls never reach the transcript.
+function sail() {
+  const p = document.createElement('p');
+  p.className = 'boat';
+  p.setAttribute('aria-label', 'Working');
+  p.innerHTML = '<span class="sea" aria-hidden="true"></span><span class="ship" aria-hidden="true">⛵</span>';
+  term.appendChild(p);
+  return p;
 }
+
+async function work(ms, id) {
+  const boat = sail();
+  await sleep(reduceMotion ? 300 : ms);
+  boat.remove();
+  return id === run;
+}
+
+// Only reasoning and the answer are shown. In between, the model reads files and runs
+// tests, but those calls stay out of view: the boat is all you see.
+const STEPS = [
+  { work: 2600, think: 'The failure is only on 29 Feb, so the leap-year check is the first suspect. I want to see where the parser validates the day.' },
+  { work: 3000, think: 'The parser builds the date before it has read the year, so it checks 29 Feb against the default year, which is not a leap year. Reading the year first fixes it without touching the other formats.' },
+  { work: 2800, think: 'Made the change and added a test for 29 Feb in a leap year and in a common year. The whole suite passes.' },
+];
 
 async function session() {
   const id = ++run;
@@ -77,41 +80,19 @@ async function session() {
     setStatus('idle');
     await sleep(900);
     if (id !== run) return;
-    if (!await type('you', 'The date parser fails on 29 Feb. Fix it and ship it.', id)) return;
+    if (!await type('you', 'The date parser fails on 29 Feb. Find out why and fix it.', id)) return;
     await sleep(500);
     setStatus('working');
-    await sleep(1100);
-    if (id !== run) return;
-    line('model', 'The parser builds the date before it knows the year, so 29 Feb is rejected as invalid. I will read the year first, then validate the day against it.');
-    await sleep(1500);
-    if (id !== run) return;
-    line('cmd', 'npm test');
-    await sleep(900);
-    if (id !== run) return;
-    line('ok', '✓ 42 passed');
-    await sleep(800);
-    if (id !== run) return;
-    line('model', 'Fixed and tested. Pushing it now.');
-    await sleep(700);
-    if (id !== run) return;
-    setStatus('asking');
-    const yes = await ask('git push origin main', id);
-    if (id !== run) return;
-    await sleep(500);
-    if (yes) {
-      setStatus('working');
-      line('cmd', 'git push origin main');
-      await sleep(900);
+    for (const step of STEPS) {
+      if (!await work(step.work, id)) return;
+      line('think', step.think);
+      await sleep(1200);
       if (id !== run) return;
-      line('model', 'Pushed to main.');
-    } else {
-      line('muted', 'Blocked: you declined "push to main or master".');
-      await sleep(700);
-      if (id !== run) return;
-      line('model', 'Understood, I have not pushed. The fix is committed locally. Should I push it to a new branch and open a pull request instead?');
     }
+    if (!await work(1600, id)) return;
+    line('model', 'Fixed. The parser now reads the year before it validates the day, so 29 Feb is accepted in leap years and still rejected in other years. One new test covers both cases.');
     setStatus('done');
-    await sleep(6000);
+    await sleep(7000);
   }
 }
 
