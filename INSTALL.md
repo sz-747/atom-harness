@@ -2,7 +2,7 @@
 
 You are installing Atom for the person you are working with. Follow these steps in order on their Windows PC, using PowerShell. Show them what you are doing, ask before installing anything globally or changing PATH, and finish with the checks in step 6. Stop and explain if a step fails; do not work around a failed install or check.
 
-Atom is a small set of extensions for the Pi coding agent. Pi does the work; Atom adds the banner, the terminal title, the guard and the workflow prompts.
+Atom is a small set of extensions for the Pi coding agent. Pi does the work; Atom adds the banner, the terminal title, the guard, Calm mode and the workflow prompts.
 
 ## 0. Check the machine
 
@@ -65,5 +65,7 @@ pi --version
 Test-Path "$base\branding\generated\header.mjs"
 npm test   # Node 24+; skip and say so on Node 22
 ```
+
+In an interactive Atom session, run `/calm`, send a prompt that uses a built-in tool, and check that the boat appears while working and the tool rows are hidden. Run `/calm` again and check that normal tool rows return. Calm is off by default; the choice is saved in Pi's agent directory. If an older standalone Calm extension is already installed, disable that copy with `pi config` before using the bundled version. Do not delete or change personal extensions without permission.
 
 Then tell the person how to start Atom: open a terminal in the project they want to work on and run `atom` (with the shim) or `$base\atom.cmd`. Atom starts in that folder, not in `$base`.
