@@ -212,7 +212,7 @@ kbd {
 /* ---------- install ---------- */
 .install { max-width: 1080px; margin: clamp(100px, 13vw, 170px) auto 0; padding: 0 var(--gutter); }
 .install .section-title { margin-bottom: 18px; }
-.install-lede { max-width: 640px; margin: 0 0 44px; color: var(--cream-dim); }
+.install-lede { margin: 0 0 44px; color: var(--cream-dim); }
 .install-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 20px; }
 .card {
   border-radius: 22px; padding: clamp(24px, 3.4vw, 38px); border: 1px solid var(--line);
@@ -239,6 +239,23 @@ kbd {
 }
 .cmds span::before { content: "> "; color: var(--lime); }
 
+/* ---------- changelog ---------- */
+.changelog { max-width: 1080px; margin: clamp(100px, 13vw, 170px) auto 0; padding: 0 var(--gutter); }
+.release {
+  display: grid; grid-template-columns: minmax(140px, 240px) minmax(0, 1fr); gap: clamp(16px, 4vw, 56px);
+  padding: clamp(26px, 4vw, 40px) 0; border-top: 1px solid var(--line);
+}
+.release-head h3 { margin: 0; font: italic 400 clamp(28px, 3.2vw, 38px)/1.05 var(--serif); }
+.release-head time { display: block; margin-top: 10px; font: 500 12.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--cream-faint); }
+.release-body ul { margin: 0 0 22px; padding-left: 1.1em; color: var(--cream-dim); }
+.release-body li { margin: 0 0 8px; }
+.release-body li::marker { color: var(--lime); }
+.release-body a { color: var(--cream); }
+.release-body .shot img { display: block; width: 100%; height: auto; }
+.mini .check b { display: inline-block; min-width: 4.6em; color: var(--lime); font-weight: 500; }
+.changelog-more { margin: 8px 0 0; padding-top: 24px; border-top: 1px solid var(--line); font-size: 15px; }
+.changelog-more a { color: var(--cream-dim); }
+
 /* ---------- footer ---------- */
 .footer {
   max-width: 1080px; margin: clamp(100px, 12vw, 160px) auto 0; padding: 30px var(--gutter) 48px;
@@ -259,6 +276,7 @@ kbd {
   .nav-links a:not(.nav-cta) { display: none; }
   .promise, .install-grid { grid-template-columns: 1fr; }
   .feature { grid-template-columns: 1fr; gap: 14px; }
+  .release { grid-template-columns: 1fr; gap: 10px; }
   .term { min-height: 360px; }
 }
 
