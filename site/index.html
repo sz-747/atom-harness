@@ -7,7 +7,7 @@
   <meta name="description" content="Atom is a quiet, Pi-based coding-agent harness for Windows. A small wrapper, minimal added instructions, and a guard before destructive commands, so you can see what the model itself can do.">
   <meta property="og:title" content="Introducing Atom">
   <meta property="og:description" content="A calm terminal for your coding agent. Small wrapper, minimal instructions, so you can see what the model itself can do.">
-  <meta property="og:image" content="https://sz-747.github.io/atom-harness/assets/atom-face.jpg">
+  <meta property="og:image" content="https://sz-747.github.io/atom-harness/assets/basilix.jpg">
   <meta name="theme-color" content="#050906">
   <link rel="icon" href="assets/atom.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,17 +61,17 @@
         </div>
         <div class="stage-body">
           <div class="stage-banner">
-            <img src="assets/atom-face.jpg" alt="Atom's startup banner: a green dragon over the word ATOM" width="1400" height="700">
+            <img src="assets/basilix.jpg" alt="Atom's startup banner: a green dragon over the word BASILIX" width="1570" height="608">
           </div>
           <div class="term" id="term" aria-live="polite"></div>
         </div>
-        <p class="stage-hint">A sample session, played on its own <span class="hint-sep">·</span> click <kbd>Yes</kbd> or <kbd>No</kbd> when the guard asks</p>
+        <p class="stage-hint">A sample session <span class="hint-sep">·</span> only the model's reasoning is shown. No tool calls, no bash, no commands: just a boat while it works.</p>
       </div>
     </section>
 
     <!-- Promise strip -->
     <section class="promise" aria-label="Highlights">
-      <div><strong>Quiet</strong><span>A small wrapper around the model, not a large system prompt. Less noise between you and what it reasons.</span></div>
+      <div><strong>Quiet</strong><span>You read the model's reasoning, not a wall of tool calls. A small boat sails while it works.</span></div>
       <div><strong>Comparable</strong><span>Run the same task here and in a heavier harness, and see how much comes from the model itself.</span></div>
       <div><strong>Guarded</strong><span>Force pushes, hard resets and recursive deletes stop and ask you first.</span></div>
     </section>
@@ -80,44 +80,87 @@
     <section class="how" id="how">
       <h2 class="section-title">Less harness.<br><em>More model.</em></h2>
 
+      <!-- Each picture is drawn from Atom's own strings (prompt descriptions, guard labels, title marks). -->
       <article class="feature">
         <span class="feature-num">01</span>
-        <div>
+        <div class="feature-text">
           <h3>Built on Pi</h3>
-          <p>Atom runs on the <a href="https://github.com/earendil-works/pi">Pi coding agent</a> and keeps its tools and project trust checks as they are. It only adds a few extensions on top, so a model's results stay easy to read and compare.</p>
+          <p>The <a href="https://github.com/earendil-works/pi">Pi coding agent</a> does the work. Atom adds four small extensions on top.</p>
         </div>
+        <figure class="shot" aria-label="Atom is Pi plus four extensions">
+          <div class="stack">
+            <span class="layer">atom-startup <i>banner</i></span>
+            <span class="layer">atom-title <i>tab status</i></span>
+            <span class="layer">atom-guard <i>asks first</i></span>
+            <span class="layer">subagent <i>delegation</i></span>
+            <span class="layer base">π Pi coding agent</span>
+          </div>
+        </figure>
       </article>
 
       <article class="feature">
         <span class="feature-num">02</span>
-        <div>
-          <h3>A calm screen</h3>
-          <p>A dragon banner fitted to your terminal, then out of the way. The tab title shows whether the agent is idle, working, done or stopped on an error, so you can look away while it works.</p>
+        <div class="feature-text">
+          <h3>Reasoning, not noise</h3>
+          <p>No tool calls, bash output or commands in the transcript. Just how the model thinks, and a boat while it works.</p>
         </div>
+        <figure class="shot" aria-label="A transcript with only reasoning lines and a sailing boat">
+          <div class="mini">
+            <p class="you">add dark mode to the settings page</p>
+            <p class="think">Settings already reads a theme token, so dark mode is a second set of tokens and a toggle.</p>
+            <p class="boat"><span class="sea" aria-hidden="true"></span><span class="ship" aria-hidden="true">⛵</span></p>
+          </div>
+        </figure>
       </article>
 
       <article class="feature">
         <span class="feature-num">03</span>
-        <div>
-          <h3>A guard before damage</h3>
-          <p>Pi has no permission system, so Atom adds one where it matters. Commands that <span class="inline-demo">force push</span>, push to <span class="inline-demo">main</span>, hard reset, discard changes or delete recursively ask you first. Say no and the model explains instead of retrying. <code>/guard</code> turns it off for a session.</p>
+        <div class="feature-text">
+          <h3>Asks before damage</h3>
+          <p>Force pushes, pushes to main, hard resets and recursive deletes wait for your yes.</p>
         </div>
+        <figure class="shot" aria-label="Atom guard asking before a force push">
+          <div class="mini">
+            <div class="guard">
+              <p class="guard-h">Atom guard: force push</p>
+              <p class="guard-cmd">git push --force origin feature<br>Run it?</p>
+              <p class="guard-actions"><span class="picked">No</span><span>Yes</span></p>
+            </div>
+          </div>
+        </figure>
       </article>
 
       <article class="feature">
         <span class="feature-num">04</span>
-        <div>
-          <h3>Short workflows when you want them</h3>
-          <p><code>/plan</code> turns a task into a checkable plan before any edit. <code>/verify</code> checks every claim against evidence before the model says done. <code>/wrapup</code> records what should outlive the session. Optional subagents can scout, plan and review.</p>
+        <div class="feature-text">
+          <h3>Short workflows</h3>
+          <p>Type <code>/</code> for plan, verify and wrap-up prompts.</p>
         </div>
+        <figure class="shot" aria-label="Atom's slash command menu">
+          <div class="mini menu">
+            <p class="you">/</p>
+            <p><b>/plan</b> Turn a task into a checkable plan before touching code</p>
+            <p><b>/verify</b> Check every claim from this session against evidence</p>
+            <p><b>/wrapup</b> Record what must outlive this session</p>
+            <p><b>/implement</b> Scout, plan, then implement</p>
+          </div>
+        </figure>
       </article>
 
       <article class="feature">
         <span class="feature-num">05</span>
-        <div>
+        <div class="feature-text">
           <h3>Starts where you are</h3>
-          <p>A native Windows launcher opens Atom in the folder you run it from, with your arguments and exit code intact. Nothing in your PATH or execution policy has to change.</p>
+          <p>Run <code>atom</code> in any project folder. The tab shows what it's doing.</p>
         </div>
+        <figure class="shot" aria-label="Atom started from a project folder, with its status in the tab title">
+          <div class="tabs">
+            <span class="tab">○ ⚛ | my-app</span><span class="tab on">⠋ ⚛ | api</span><span class="tab">✓ ⚛ | site</span>
+          </div>
+          <div class="mini">
+            <p class="ps">PS C:\code\api&gt; <b>atom</b></p>
+          </div>
+        </figure>
       </article>
     </section>
 
