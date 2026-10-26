@@ -2,6 +2,8 @@
 
 Atom is a calm, Pi-based coding-agent harness for testing bare model capability.
 
+Launch page: <https://sz-747.github.io/atom-harness/>. To have a coding agent install it for you, give it [INSTALL.md](INSTALL.md).
+
 It is designed to compare what a model can do with a small, quiet wrapper against heavier harnesses such as Claude Code and Codex. Atom keeps the useful parts of an agent shell while removing visual noise: tool-call rows stay out of the transcript, reasoning remains readable, and a small boat shows that the model is working.
 
 ## What it includes
