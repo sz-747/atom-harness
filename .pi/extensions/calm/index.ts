@@ -1,107 +1,106 @@
-// Copyright (c) 2026 sz-747. Licensed under the repository's MIT license.
-import { AgentSession, ToolExecutionComponent, getAgentDir, type ExtensionAPI, type ExtensionUIContext } from "@earendil-works/pi-coding-agent";
-import type { Component } from "@earendil-works/pi-tui";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
-import { createShip } from "./ship.ts";
+// Atom Calm - a presentation-only "calm transcript" toggle for Pi.
+//
+// Adapted from Kun Chen's Pi Calm extension (itself adapted from Firstmate).
+// Copyright (c) 2026 Kun Chen. MIT License - see the LICENSE file in this directory.
+//
+// Aligned with Pi 0.85.1 (see ATOM-CONFIG.md in E:\atom-harness). Every Pi seam
+// this extension touches was checked against that version:
+//   - AgentSession.prototype.getToolDefinition / getAllTools (sourceInfo.source "builtin")
+//   - ToolExecutionComponent.prototype.render
+//   - ExtensionUIContext.setWidget / setWorkingVisible / getToolsExpanded / setToolsExpanded
+//
+// /calm toggles it; the choice is stored in ~/.pi/agent/calm and is off by default.
+// When on: the call/result shells of Pi's built-in tools are hidden (their image
+// results stay) and a small boat replaces Pi's working row during a run. Thinking
+// is deliberately left to Pi (settings hideThinkingBlock, Ctrl+T, click on a block)
+// so the model's reasoning still shows where a long run is up to. Two parts of
+// Kun's version were dropped for 0.85.1: the zero-row thinking adapter (Steve wants
+// reasoning visible) and the /export and /share stock-render guard (0.85.1 exports
+// HTML through core/export-html and shares JSONL, neither of which renders through
+// the patched TUI component). Calm never changes prompts, tool execution, model
+// context, or session data.
+import { type ExtensionAPI, type ExtensionUIContext } from "@earendil-works/pi-coding-agent";
+import { installCalmBuiltInToolShellLayout } from "./lib/built-in-tool-shells.ts";
+import { loadCalmPreference, persistCalmPreference } from "./lib/preference.ts";
+import { calmPresentationIsActive, setCalmPresentation } from "./lib/visibility.ts";
+import { CALM_WORKING_SHIP_WIDGET_KEY, createCalmWorkingShipAnimation, createCalmWorkingShipWidget } from "./lib/working-ship.ts";
 
-// Pi has no public API for hiding a whole built-in tool row. Tag a presentation
-// copy of its definition so the registry and executors remain untouched. Symbols
-// survive Pi's object spread when it adds renderers to the row definition.
-const adapterKey = Symbol.for("atom.calm.presentation.v1");
-const rowOrigin = Symbol.for("atom.calm.builtin.v1");
-type Adapter = { enabled: boolean };
-type ToolRow = {
-	toolDefinition?: { [rowOrigin]?: boolean };
-	imageComponents?: Component[];
-	imageSpacers?: Component[];
-};
-
-function presentationAdapter(): Adapter {
-	const globals = globalThis as typeof globalThis & { [adapterKey]?: Adapter };
-	if (globals[adapterKey]) return globals[adapterKey];
-	const lookup = AgentSession.prototype.getToolDefinition;
-	const render = ToolExecutionComponent.prototype.render;
-	if (typeof lookup !== "function" || typeof render !== "function") {
-		throw new Error("This Pi version does not expose the tool presentation hooks required by Calm.");
+// The adapter probes the exact Pi API it patches. If a future Pi removes that API,
+// it degrades with one diagnostic and the boat keeps working.
+function installCalmPresentationAdapter(name: string, install: () => void): void {
+	try {
+		install();
+	} catch (error) {
+		const reason = error instanceof Error ? error.message : String(error);
+		console.error(`Calm: ${name} presentation adapter unavailable, skipping. ${reason}`);
 	}
-	const state: Adapter = { enabled: false };
-	AgentSession.prototype.getToolDefinition = function (name) {
-		const definition = lookup.call(this, name);
-		if (!definition) return undefined;
-		const overrides = (this as unknown as { _baseToolsOverride?: Record<string, unknown> })._baseToolsOverride;
-		const builtin = this.getAllTools().some(tool => tool.name === name && tool.sourceInfo.source === "builtin");
-		return { ...definition, [rowOrigin]: builtin && !Object.hasOwn(overrides ?? {}, name) };
-	};
-	ToolExecutionComponent.prototype.render = function (width) {
-		const row = this as unknown as ToolRow;
-		if (!state.enabled || !row.toolDefinition?.[rowOrigin]) {
-			return render.call(this, width);
-		}
-		// Preserve Pi's already-created image components, including their spacers.
-		return (row.imageComponents ?? []).flatMap((image, i) => [
-			...(row.imageSpacers?.[i]?.render(width) ?? []), ...image.render(width),
-		]);
-	};
-	globals[adapterKey] = state;
-	return state;
 }
 
 export default function calm(pi: ExtensionAPI): void {
-	let adapter: Adapter | undefined;
-	let enabled = false;
-	let running = false;
-	let ui: ExtensionUIContext | undefined;
-	let widget: ReturnType<typeof createShip> | undefined;
-	let showingShip = false;
-	const preference = () => join(getAgentDir(), "calm");
+	installCalmPresentationAdapter("built-in-tool-shells", installCalmBuiltInToolShellLayout);
 
-	function update(): void {
-		if (!ui) return;
-		if (adapter) adapter.enabled = enabled;
-		const wanted = enabled && running;
-		if (wanted !== showingShip) {
-			widget?.dispose();
-			widget = undefined;
-			ui.setWidget("atom-calm-ship", wanted ? tui => (widget = createShip(tui)) : undefined);
-			showingShip = wanted;
+	// One logical run, tracked from agent_start to agent_settled, so the boat does not
+	// flicker between tool calls, continuations, retries, or compaction inside a run.
+	let agentRunActive = false;
+	let workingShipShown = false;
+	// One animation per extension lifetime; hiding freezes it, session_start resets it.
+	const workingShipAnimation = createCalmWorkingShipAnimation();
+
+	// Sole owner of the working-row choice. The widget is only created or removed on a
+	// real transition, so repeated starts cannot duplicate its timer.
+	const applyWorkingPresentation = (ui: ExtensionUIContext, forceStockVisibility = false): void => {
+		const showShip = agentRunActive && calmPresentationIsActive();
+		if (showShip !== workingShipShown) {
+			workingShipShown = showShip;
+			ui.setWidget(CALM_WORKING_SHIP_WIDGET_KEY, showShip ? tui => createCalmWorkingShipWidget(tui, workingShipAnimation) : undefined);
+			ui.setWorkingVisible(!showShip);
+		} else if (forceStockVisibility && !showShip) {
+			ui.setWorkingVisible(true);
 		}
-		ui.setWorkingVisible(!wanted);
-	}
+	};
+
+	// Flip tool expansion twice to force a transcript redraw while keeping the Ctrl+O state.
+	const redrawTranscript = (ui: ExtensionUIContext): void => {
+		const expanded = ui.getToolsExpanded();
+		ui.setToolsExpanded(!expanded);
+		ui.setToolsExpanded(expanded);
+	};
 
 	pi.on("session_start", (_event, ctx) => {
-		if (ctx.mode !== "tui") return;
-		ui = ctx.ui;
-		running = false;
-		try { enabled = readFileSync(preference(), "utf8").trim() === "on"; }
-		catch { enabled = false; }
-		try { adapter = presentationAdapter(); }
-		catch (error) { ui.notify(`Calm tool hiding unavailable: ${String(error)}`, "warning"); }
-		update();
+		setCalmPresentation(loadCalmPreference());
+		agentRunActive = false;
+		workingShipShown = false;
+		workingShipAnimation.reset();
+		applyWorkingPresentation(ctx.ui, true);
 	});
-	pi.on("agent_start", () => { running = true; update(); });
-	pi.on("agent_settled", () => { running = false; update(); });
-	pi.on("session_shutdown", () => {
-		running = false;
-		update();
-		if (adapter) adapter.enabled = false;
-		widget?.dispose();
-		ui = undefined;
+
+	pi.on("agent_start", (_event, ctx) => {
+		agentRunActive = true;
+		applyWorkingPresentation(ctx.ui);
 	});
+
+	// agent_settled fires from a finally block, so it also covers abort and failure.
+	pi.on("agent_settled", (_event, ctx) => {
+		agentRunActive = false;
+		applyWorkingPresentation(ctx.ui);
+	});
+
+	pi.on("session_shutdown", (_event, ctx) => {
+		agentRunActive = false;
+		applyWorkingPresentation(ctx.ui);
+	});
+
 	pi.registerCommand("calm", {
-		description: "Toggle hidden built-in tool rows and the working boat (display only)",
+		description: "Toggle Calm: hide built-in tool shells and show a boat while working (presentation only)",
 		handler: async (_args, ctx) => {
-			if (ctx.mode !== "tui") return ctx.ui.notify("Calm requires the interactive terminal.", "info");
-			const next = !enabled;
-			// The existing plain on/off preference also works with older installations.
-			mkdirSync(getAgentDir(), { recursive: true });
-			writeFileSync(preference(), next ? "on\n" : "off\n", "utf8");
-			enabled = next;
-			update();
-			const expanded = ctx.ui.getToolsExpanded();
-			ctx.ui.setToolsExpanded(!expanded);
-			ctx.ui.setToolsExpanded(expanded);
-			ctx.ui.notify(`Calm ${enabled ? "on" : "off"}`, "info");
+			const active = !calmPresentationIsActive();
+			// Persist first: if the file cannot be written, the toggle fails with a clear
+			// error instead of silently reverting on the next restart.
+			persistCalmPreference(active);
+			setCalmPresentation(active);
+			applyWorkingPresentation(ctx.ui, true);
+			redrawTranscript(ctx.ui);
+			ctx.ui.notify(`Calm ${active ? "on" : "off"}`, "info");
 		},
 	});
 }

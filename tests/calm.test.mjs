@@ -6,7 +6,7 @@ import { dirname, join, resolve } from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { mock } from "node:test";
-import { createShip } from "../.pi/extensions/calm/ship.ts";
+import { createCalmWorkingShipAnimation, createCalmWorkingShipWidget } from "../.pi/extensions/calm/lib/working-ship.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const globalModules = execSync("npm root -g", { encoding: "utf8" }).trim();
@@ -58,9 +58,10 @@ try {
 	};
 	const ctx = { mode: "tui", ui };
 	const toggle = () => extension.commands.get("calm").handler("", ctx);
-	// No stored setting: opt in. Non-TUI modes must not install a boat.
+	// No stored setting: opt in. Non-TUI modes do not install a boat.
 	for (const mode of ["print", "json", "rpc"]) await emit("session_start", { mode, ui });
-	assert.equal(visible, undefined);
+	assert.equal(widget, undefined);
+	assert.equal(visible, true);
 	await emit("session_start", ctx);
 	await emit("agent_start", ctx);
 	assert.equal(widget, undefined);
@@ -81,8 +82,8 @@ try {
 		getAllTools: () => [{ name: "read", sourceInfo: { source: "builtin" } }],
 	};
 	const found = AgentSession.prototype.getToolDefinition.call(session, "read");
-	assert.notEqual(found, definition, "Presentation metadata does not mutate the registry");
-	assert.equal(Reflect.ownKeys(definition).some(key => typeof key === "symbol"), false);
+	assert.equal(found, definition, "The old adapter preserves the active definition");
+	assert(Reflect.ownKeys(definition).some(key => typeof key === "symbol"), "Built-in metadata marks the active definition");
 	assert.equal(found.execute, execute);
 	assert.equal((await found.execute()).content[0].text, "unchanged");
 	const row = new ToolExecutionComponent("read", "call-1", { path: "test.txt" }, {}, withBuiltInRenderers("read", { ...found }), { requestRender() {} }, root);
@@ -94,7 +95,10 @@ try {
 	assert.deepEqual(row.render(80), ["", "IMAGE"]);
 	row.imageComponents = []; row.imageSpacers = [];
 	// Even a custom tool that reuses a built-in executor must remain visible.
-	const customDefinition = { ...definition };
+	const customDefinition = {
+		name: definition.name, label: definition.label, description: definition.description,
+		parameters: definition.parameters, execute: definition.execute,
+	};
 	const custom = new ToolExecutionComponent("read", "custom", {}, {}, customDefinition, { requestRender() {} }, root);
 	assert(custom.render(80).length > 0, "Custom overrides remain visible");
 	const sdkSession = { ...session, _baseToolsOverride: { read: customDefinition }, _toolDefinitions: new Map([["read", { definition: customDefinition }]]) };
@@ -117,7 +121,7 @@ try {
 	assert(widget, "Saved preference survives session restart");
 	await emit("session_shutdown", ctx);
 	assert.equal(widget, undefined);
-	assert(row.render(80).length > 0, "Shutdown disables presentation patch");
+	// The legacy adapter remains installed process-wide; the next session_start resets its state.
 	writeFileSync(join(scratch, "calm"), "invalid");
 	await emit("session_start", ctx); await emit("agent_start", ctx);
 	assert.equal(widget, undefined, "Invalid preference is off");
@@ -126,7 +130,8 @@ try {
 	console.log("PASS toggle persistence, run lifecycle, retries, non-TUI guard, timer cleanup");
 
 	const plain = text => text.replace(/\x1b\[[0-9;]*m/g, "");
-	const ship = createShip({ requestRender() {} });
+	const animation = createCalmWorkingShipAnimation();
+	const ship = createCalmWorkingShipWidget({ requestRender() {} }, animation);
 	for (let step = 0; step < 200; step++) {
 		mock.timers.tick(220);
 		for (let width = 0; width <= 160; width++) {
