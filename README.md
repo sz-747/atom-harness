@@ -8,7 +8,7 @@ It is designed to compare what a model can do with a small, quiet wrapper agains
 
 ## What it includes
 
-- A calm terminal UI with Atom's dragon header and boat working indicator.
+- A terminal UI with Atom's dragon header and an optional Calm mode: hidden built-in tool rows and a boat working indicator.
 - A native Windows launcher that preserves the project working directory.
 - A confirmation guard for destructive shell commands and publishing actions.
 - Optional Pi subagents and short workflow prompts.
@@ -26,6 +26,12 @@ npm install
 ```
 
 The launcher starts Atom in the current directory, so run it from the project you want to work on.
+
+## Calm mode
+
+Run `/calm` in the interactive terminal to hide built-in tool-call and text-result rows and show an animated boat while Atom works. Run it again to restore Pi's normal display. Calm starts off on a fresh install and remembers your choice in Pi's agent directory.
+
+Reasoning, custom tools, and image results remain visible. Tool execution, model context, and saved session data do not change. JSON, RPC, and print modes are unaffected. See [Calm implementation and compatibility](.pi/extensions/calm/README.md).
 
 ## Verify
 
