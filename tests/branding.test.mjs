@@ -32,7 +32,12 @@ for (const base of [root, globalModules, join(globalModules, "vercel")]) {
 	try { ts = require(require.resolve("typescript", { paths: [base] })); break; } catch {}
 }
 assert(ts, "TypeScript compiler not found. Install/provide TypeScript to run the typecheck.");
-const sourceFiles = [".pi/extensions/atom-startup.ts", "branding/face.ts", "branding/atom-wordmark.ts", "branding/theme/forest.ts"].map(f => join(root, f));
+const sourceFiles = [
+	".pi/extensions/atom-startup.ts",
+	".pi/extensions/atom-compaction.ts",
+	".pi/extensions/atom-footer.ts",
+	"branding/face.ts", "branding/atom-wordmark.ts", "branding/theme/forest.ts",
+].map(f => join(root, f));
 const options = {
 	noEmit: true, strict: true, skipLibCheck: true, jsx: ts.JsxEmit.ReactJSX,
 	target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext,
