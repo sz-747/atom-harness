@@ -8,7 +8,7 @@
     "sample": "node scripts/sample-face.mjs",
     "prebuild": "npm run sample",
     "build": "node scripts/build.mjs",
-    "test": "npm run build && node tests/branding.test.mjs",
+    "test": "npm run build && node tests/branding.test.mjs && node tests/calm.test.mjs",
     "preview": "npm run build && node scripts/preview.mjs"
   },
   "dependencies": {
