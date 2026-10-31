@@ -70,5 +70,5 @@ export function paintRun(text: string, foreground: RGB, background: RGB | undefi
 	const codes = [sgr(foreground, false, mode)];
 	// Fill only occupied cells, never the surrounding terminal; 16-color mode has no dark green background.
 	if (background && (mode !== "ansi16" || luminance(background) > 70)) codes.push(sgr(background, true, mode));
-	return `[${codes.join(";")}m${text}[0m`;
+	return `\x1b[${codes.join(";")}m${text}\x1b[0m`;
 }

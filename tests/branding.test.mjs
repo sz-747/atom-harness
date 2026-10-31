@@ -282,8 +282,8 @@ try {
 		const painted = lines.map(line => {
 			const cells = [];
 			let fg = null, col = 0;
-			for (const token of line.split(/([[0-9;]*m)/g)) {
-				if (token.startsWith("[")) {
+			for (const token of line.split(/(\x1b[[0-9;]*m)/g)) {
+				if (token.startsWith("\x1b[")) {
 					const codes = token.slice(2, -1).split(";").map(Number);
 					for (let i = 0; i < codes.length; i++) {
 						if (codes[i] === 38) { fg = codes[i + 1] === 2 ? codes.slice(i + 2, i + 5) : null; i += codes[i + 1] === 2 ? 4 : 2; }
