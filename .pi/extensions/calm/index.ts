@@ -1,4 +1,4 @@
-// Atom Calm - a presentation-only "calm transcript" toggle for Pi.
+// Atom Calm - an outcome-oriented progress view for Pi.
 //
 // Adapted from Kun Chen's Pi Calm extension (itself adapted from Firstmate).
 // Copyright (c) 2026 Kun Chen. MIT License - see the LICENSE file in this directory.
@@ -10,11 +10,13 @@
 //   - ExtensionUIContext working widgets, visibility and transcript expansion
 // See README.md in this directory for tested versions and limits.
 //
-// /calm hides built-in tool shells and replaces the working row with a boat.
-// Image results, custom tools and Pi's own reasoning visibility remain unchanged.
-// Calm changes neither prompts nor tool execution, model context or session data.
+// /calm groups reported subtasks, preserves expandable tool evidence and images,
+// and replaces the working row with a boat. Work-progress metadata is recorded
+// through one model-authored tool; no extra model/classifier or task runner is used.
 import { type ExtensionAPI, type ExtensionUIContext } from "@earendil-works/pi-coding-agent";
 import { installCalmBuiltInToolShellLayout } from "./lib/built-in-tool-shells.ts";
+import { CalmProgress } from "./lib/progress.ts";
+import { attachWorkProgress } from "./lib/work-progress.ts";
 import { loadCalmPreference, persistCalmPreference } from "./lib/preference.ts";
 import { calmPresentationIsActive, setCalmPresentation } from "./lib/visibility.ts";
 import { CALM_WORKING_SHIP_WIDGET_KEY, createCalmWorkingShipAnimation, createCalmWorkingShipWidget } from "./lib/working-ship.ts";
@@ -31,7 +33,8 @@ function installCalmPresentationAdapter(name: string, install: () => void): void
 }
 
 export default function calm(pi: ExtensionAPI): void {
-	installCalmPresentationAdapter("built-in-tool-shells", installCalmBuiltInToolShellLayout);
+	let progress = new CalmProgress();
+	installCalmPresentationAdapter("built-in-tool-shells", () => installCalmBuiltInToolShellLayout(() => progress));
 
 	// One logical run, tracked from agent_start to agent_settled, so the boat does not
 	// flicker between tool calls, continuations, retries, or compaction inside a run.
@@ -61,6 +64,7 @@ export default function calm(pi: ExtensionAPI): void {
 	};
 
 	pi.on("session_start", (_event, ctx) => {
+		progress = new CalmProgress();
 		setCalmPresentation(loadCalmPreference());
 		agentRunActive = false;
 		workingShipShown = false;
@@ -85,7 +89,7 @@ export default function calm(pi: ExtensionAPI): void {
 	});
 
 	pi.registerCommand("calm", {
-		description: "Toggle Calm: hide built-in tool shells and show a boat while working (presentation only)",
+		description: "Toggle Calm: show subtask progress and outcomes with expandable operation details",
 		handler: async (_args, ctx) => {
 			const active = !calmPresentationIsActive();
 			// Persist first: if the file cannot be written, the toggle fails with a clear
@@ -97,4 +101,5 @@ export default function calm(pi: ExtensionAPI): void {
 			ctx.ui.notify(`Calm ${active ? "on" : "off"}`, "info");
 		},
 	});
+	attachWorkProgress(pi, () => progress);
 }

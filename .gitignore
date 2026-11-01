@@ -1,4 +1,5 @@
 node_modules/
+local/
 branding/generated/
 
 # Local operator notes are not part of the public repository.

@@ -56,10 +56,10 @@ try {
 		setToolsExpanded(value) { expanded = value; },
 		notify(...args) { notices.push(args); },
 	};
-	const ctx = { mode: "tui", ui };
+	const ctx = { mode: "tui", ui, sessionManager: { getBranch: () => [] } };
 	const toggle = () => extension.commands.get("calm").handler("", ctx);
 	// No stored setting: opt in. Non-TUI modes do not install a boat.
-	for (const mode of ["print", "json", "rpc"]) await emit("session_start", { mode, ui });
+	for (const mode of ["print", "json", "rpc"]) await emit("session_start", { ...ctx, mode });
 	assert.equal(widget, undefined);
 	assert.equal(visible, true);
 	await emit("session_start", ctx);
@@ -83,18 +83,21 @@ try {
 	};
 	const found = AgentSession.prototype.getToolDefinition.call(session, "read");
 	assert.equal(found, definition, "The old adapter preserves the active definition");
-	assert(Reflect.ownKeys(definition).some(key => typeof key === "symbol"), "Built-in metadata marks the active definition");
+	assert(!Reflect.ownKeys(definition).some(key => typeof key === "symbol"), "The progress adapter never patches active tool definitions");
 	assert.equal(found.execute, execute);
 	assert.equal((await found.execute()).content[0].text, "unchanged");
 	const row = new ToolExecutionComponent("read", "call-1", { path: "test.txt" }, {}, withBuiltInRenderers("read", { ...found }), { requestRender() {} }, root);
 	row.updateResult({ content: [{ type: "text", text: "stored output" }], details: {} });
-	assert.deepEqual(row.render(80), []);
+	assert.deepEqual(row.render(80), ["✓ Read test.txt"]);
+	row.setExpanded(true);
+	assert(row.render(80).join("\n").includes("stored output"), "Expanded rows preserve Pi's original evidence view");
+	row.setExpanded(false);
 	assert.equal(row.result.content[0].text, "stored output");
 	row.imageComponents = [{ render: () => ["IMAGE"] }];
 	row.imageSpacers = [{ render: () => [""] }];
-	assert.deepEqual(row.render(80), ["", "IMAGE"]);
+	assert.deepEqual(row.render(80), ["✓ Read test.txt", "", "IMAGE"]);
 	row.imageComponents = []; row.imageSpacers = [];
-	// Even a custom tool that reuses a built-in executor must remain visible.
+	// Custom/SDK operations use the same compact view without changing execution.
 	const customDefinition = {
 		name: definition.name, label: definition.label, description: definition.description,
 		parameters: definition.parameters, execute: definition.execute,
@@ -126,7 +129,7 @@ try {
 	await emit("session_start", ctx); await emit("agent_start", ctx);
 	assert.equal(widget, undefined, "Invalid preference is off");
 	await emit("session_shutdown", ctx);
-	console.log("PASS real Pi loader/rows: hide, restore, images, custom/SDK overrides, unchanged execution/results");
+	console.log("PASS real Pi loader/rows: compact operations, expanded evidence, images, custom/SDK overrides, unchanged execution/results");
 	console.log("PASS toggle persistence, run lifecycle, retries, non-TUI guard, timer cleanup");
 
 	const plain = text => text.replace(/\x1b\[[0-9;]*m/g, "");
