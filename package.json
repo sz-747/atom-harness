@@ -8,12 +8,13 @@
     "sample": "node scripts/sample-face.mjs",
     "prebuild": "npm run sample",
     "build": "node scripts/build.mjs",
-    "test": "npm run build && node tests/branding.test.mjs && node tests/calm.test.mjs",
+    "test": "npm run build && node tests/branding.test.mjs && node tests/calm.test.mjs && node --test tests/progress.test.mjs tests/progress-flow.test.mjs",
     "preview": "npm run build && node scripts/preview.mjs"
   },
   "dependencies": {
     "ink": "7.1.1",
-    "react": "19.2.7"
+    "react": "19.2.7",
+    "typebox": "1.3.27"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
